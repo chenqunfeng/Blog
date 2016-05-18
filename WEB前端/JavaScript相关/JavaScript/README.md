@@ -1,2 +1,0 @@
-# cqf
-OnlyForMySelf
