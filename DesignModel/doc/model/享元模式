@@ -1,0 +1,29 @@
+运用共享技术有效地支持大量细粒度的对象
+
+FlyweightFactory:
+  享元工厂,用来创建并管理Flyweight对象。它主要是用来确保合理地共享Flyweight,当用户请求一个Flyweight时,
+  FlyweightFactory对象提供一个已创建的实例或者创建一个(如果不存在的话)
+Flyweight(聚合在FlyweightFactory中):
+  所有具体享元类的超类或接口,通过这个接口,Flyweight可以接受并作用于外部状态
+ConcreteFlyweight:
+  需要共享的Flyweight子类
+UnsharedConcreteFlyweight:
+  不需要共享的Flyweight子类
+
+内部状态:
+  不会随环境改变而改变的共享部分
+外部状态:
+  会随环境改变而改变的共享部分
+  
+好处:
+  可以避免大量非常相似类的开销
+
+应用:
+  1.如果一个应用程序使用了大量的对象,而大量的这些对象造成了很大的存储开销时就应该考虑使用
+  2.还有就是对象的大多数状态可以为外部状态,如果删除对象的外部状态,那么可以用相对较少的共享对象取代很多组对象
+  
+如.NET中字符串string就是运用了Flyweight
+string a = "123"
+string b = "456"
+Object.ReferenceEquals(a,b) == true
+如javascript事件委托

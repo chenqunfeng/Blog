@@ -1,0 +1,19 @@
+简单工厂模式
+
+如商城打折优惠中
+1.正常价格
+2.满300减100
+3.半折优惠
+
+这几种情况都属于打折,那么它们可以继承同一个打折的类(CashSuper),再由这个大类去实例化这些具体优惠
+
+而工厂模式(CashFactory)可以在这个大类的基础上封装,用来实例化这些优惠
+CashSuper a = CashFactory.createCashAccept(type)
+
+这种情况,暴露给实例化也就是客户端有两个对象,一个是CashSuper,另一个是CashFactory
+
+而运用策略模式和工厂模式则可以进一步解决这个问题
+
+
+附上javascript实现代码
+- -,代码请左转code目录
