@@ -1,0 +1,26 @@
+
+webkit
+
+老式写法
+-webkit-gradient(linear, left top, left bottom, from(#ccc), to(#000));
+第一个参数:表示渐变类型
+第二个参数:表示渐变起点
+第三个参数:表示渐变终点
+第四个参数:color-stop函数,接受两个参数,第一个表示渐变的位置,0为起点,0.5为中点,1为结束点;第二个表示该点的颜色
+第五个参数:color-stop函数,接受两个参数,第一个表示渐变的位置,0为起点,0.5为中点,1为结束点;第二个表示该点的颜色
+新式写法
+-webkit-linear-gradient(top, #ccc, #000);
+第一个参数:表示起点位置
+第二个参数,第三个参数:颜色
+
+Opera
+
+-o-linear-gradient(top, #ccc, #000)
+第一个参数:表示起点位置
+第二个参数,第三个参数:颜色
+
+Trident
+
+filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr=#ccc, endColorstr=#000); /*IE9*/
+-ms-filter: "progid:DXImageTransform.Microsoft.gradient (GradientType=0, startColorstr=#ccc, endColorstr=#000)"; /*IE8+*/
+IE依靠滤镜实现渐变,startColorstr表示起点的颜色,endColorstr表示终点颜色,GradientType表示渐变类型,0为缺省值,表示垂直渐变,1表示水平渐变

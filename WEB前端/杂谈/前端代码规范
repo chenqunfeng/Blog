@@ -1,0 +1,33 @@
+最近看到一份总结前端代码规范的文章,觉得十分有用,也担心某天是否会突然失效,所以在总结一份以后附上源链接
+一.通用约定
+  1.缩进
+    一般采用4个空格缩进
+  2.可读性
+    提倡使用注释,上线再统一进行压缩
+二.HTML
+  1.Doctype
+    使用合适的标记来告诉浏览器触发标准模式,坚决避免Quirks模式(会导致页面向后兼容,可能出现一些bug)
+    html5 Doctype
+    <!DOCTYPE html>
+    而html4则需要根据需要声明多种Doctype, - -
+  2.字符编码
+    所有标记必须通过UTF-8编码传递，因为这种编码方式是对国际化最友好的
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    在html5中,你只需要
+    <meta charset="utf-8">
+  3.标记使用规范
+    段落分隔符要使用实际对应的<p>元素，而不是用多个<br>标签。
+    在合适的条件下，充分利用<dl> （定义列表）和<blockquote> 标签。
+    列表中的条目必须总是放置于<ul>、<ol>或<dl> 中，永远不要用一组 <div>或<p> 来表示。
+    给每个表单里的字段加上 <label> 标签，其中的 for 属性必须和对应的输入字段对应，这样用户就可以点击标签。同理，给标签加上 
+    cursor:pointer; 样式也是明智的做法。
+    不用使用输入字段中的 size 属性。该属性是和输入字段里文本的 font-size 相关的。应该使用CSS宽度。
+    在某些闭合的 </div> 标签旁边加上一段html注释，说明这里闭合的是什么元素。这在有大量嵌套和缩进的情况下会很有用。
+    不要把表格用于页面布局。
+    在合适的条件下，利用 microformats 和/或者 Microdata ，具体说是 hCard 和 adr。
+    在合适的条件下，利用 <thead>、<tbody>和<th>标签 (以及Scope属性）。
+  4.属性加引号
+    在HTML5规范里并没有严格要求属性值两边加引号。但考虑到一些属性可以接受空白值，为了保持一致性，我们要求所有属性值必须加上引号。
+    <p class="text">This is my paragraph.</p>
+
+参考链接:http://coderlmn.github.io/code-standards/#_css

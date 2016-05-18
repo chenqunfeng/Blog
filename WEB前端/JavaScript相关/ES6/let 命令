@@ -1,0 +1,66 @@
+ES6新增,用来声明变量,用法类似于var。
+但是！！！
+用let声明的变量只在let命令所在的代码块内有效
+
+{
+let a = 10;
+}
+a // ReferenceError
+
+如此,便让javascript有了块级作用域
+场景
+
+1.解决一些需要使用闭包的场景
+var a = [];
+for (var i = 0; i < 10; i++) {
+  a[i] = function () {
+    console.log(i);
+  };
+}
+a[6](); // 10
+因为这里的var i 在全局范围都有效,若强行使用这种方法来实现效果的话,无可避免是要使用一个闭包的,但是若将var替换成为let变成解决这种问题
+
+2.不会存在变量提升
+a // ReferenceError
+let a = 2
+
+3.暂时性死区
+var a = 123;
+{
+  a //ReferenceError
+  let a
+}
+只要块级作用域存在let,那么它所声明的变量就会binding在这个区域,不会受到外部的影响
+
+4.不允许重复声明
+{
+  var a = 1;
+  let a = 2; // error
+}
+{
+  let a = 1;
+  let a = 2; // rror
+}
+function func(arg) {
+  let arg; // error
+}
+
+function func(arg) {
+  {
+    let arg; // true
+  }
+}
+
+思考:
+  let关键字带来的块级作用域问题
+  可以让我们抛弃掉现有的一些写法,如匿名函数的块级作用域
+  而关于块级作用域，这里我们还有一点需要说明，那便是函数，函数的作用域在ES6中也会被作用
+  function test() {console.log("outside")}
+  (function(){
+    if (true){
+      function test() {console.log("inside")}
+    }
+    test()
+  })()
+  在ES5中，因为函数声明提升，匿名函数内的test会被提升到匿名函数全局作用域下，所以当再执行test的时候便是执行的inside的test方法
+  在ES6中，因为if是一个块级作用域，test函数不会因为函数声明提升被提升到匿名函数全局作用域下，所以执行test的时候是执行outside的方法

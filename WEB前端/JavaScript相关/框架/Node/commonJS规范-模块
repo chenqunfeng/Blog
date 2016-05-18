@@ -1,0 +1,118 @@
+CommonJS的模块规范
+  模块的一些基本内容:
+    1.引入语法
+      require方法
+      var math = require('math') // 这里的require()方法接受模块标识,
+                                    以此引入一个模块的API到当前上下文中
+    2.导出语法
+      export方法
+      export对象用于导出当前模块的方法或者变量,并且它是唯一导出的出口
+    3.module对象
+      代表模块自身,而export是module的属性,在node中,一个文件就是一个模块
+    4.模块标识
+      这里的标识就是require()方法的参数,它必须是符合小驼峰命名的字符串,
+      或者以.、..开头的相对路径,或者绝对路径
+     
+    模块的定义十分简单,接口也十分简洁,而且每个模块具有独立的空间,它们互不干扰。
+    而也因为这样,这套模块导出和引入机制使得用户完全不必考虑变量污染。
+  模块的实现原理:
+    步骤过程:
+      1.路径分析
+        模块标识符分析:
+          ①核心模块,如http、fs、path
+            优先从缓存中加载
+            PS:如果这个时候一个与核心模块标识符相同的自定义模块,它的加载应该是如何的?
+            答:这个自定义模块是不会加载成功的
+          ②.或..开始的相对路径文件模块
+          ③以/开始的绝对路径文件模块
+          ④非路径形式的文件模块,如自定义的connect模块(这类模块的查找是最费时的,也是最慢的一种查找方式)
+            创建一个module_path.js文件,内容为console.log(module.paths)
+            放到任意目录,然后执行node module_path.js
+            linux:
+              ['/home/jackson/research/node_modules',
+               '/home/jackson/node_modules',
+               '/home/node_modules',
+               '/node_modules']
+            windows:
+              ['c:\\nodejs\\node_modules','c:\\node_modules']
+            可以看出,模板路径的生成规则如下,
+              当前文件目录下的node_modules目录
+              父目录下的node_modules目录
+              父目录的父目录下的node_modules目录
+              ...
+              逐级递归,直到根目录下的node_modules目录
+      2.文件定位
+        文件扩展名分析 ----> (如果扩展名下查找不到) ----> 目录分析和包
+        node会按.js/.json/.node的次序依次补足扩展名
+        PS:所以如果是.node或者.json扩展名,应该补全,以加快查询速度
+        若扩展名查找失败,这个时候会得到一个目录,而此时node会把这个目录当作一个包来处理
+        首先,会查找package.json,通过JSON.parse()解析出包描述对象,从中取出main属性指定的文件名进行定位。
+        如果缺少扩展名,则会进入扩展名分析环节,如果main属性指定的文件名错误,或者压根没有package.json文件,
+        则node会将index当作默认文件名,进入扩展名分析环节。
+        如果最后都没有查找到,则抛出查找失败的异常。
+      3.编译执行
+        模块的定义
+        function Module(id, parent){
+          this.id = id;
+          this.exports = {};
+          this.parent = parent;
+          if (parent && parent.children){
+            parent.children.push(this);
+          }
+          this.filename = null;
+          this.loaded = false;
+          this.children = [];
+        }
+        编译进行时,Node会新建一个模块对象,然后根据路径载入并编译
+        .js文件,通过fs模块同步读取文件后编译执行
+        .node文件,这是c/c++编写的扩展文件,通过dlopen()方法加载最后编译生成的文件
+        .json文件,通过fs模块同步读取文件后,用JSON.parse()解析返回结果
+        其余扩展名文件,都会被当作.js文件载入
+        每一个编译成功的模块都会将其文件路径作为索引缓存在Module._cache对象上,以提高二次引入的性能.
+        细看javascript模块的编译:
+          如果是把直接定义模块的过程放诸在浏览器端,会存在污染全部变量的情况.
+          而事实上,在编译的过程中,Node对获取的javascript文件内容进行了头尾包装,在头部添加了
+          (function(exports, require, module, __filename, __dirname){\n,在尾部添加了\n})
+          这样每个模块文件之间都进行了作用域隔离。
+          然后对包装过后的代码回通过vm原生模块的runInThisContext()方法执行(类似eval,只是有明确上下文,不污染全局),
+          返回一个具体的function对象。最后,将当前模块对象的exports属性,require()方法,module(模块对象),以及在文件
+          定位中得到的完整文件路径和文件目录作为参数传递给这个function()执行
+        细看c/c++模块的编译:
+          Node调用process.dlopen()方法进行加载和执行
+        细看JSON文件的编译u:
+          Node利用fs模块同步读取JSON文件的内容之后,调用JSON.parse()方法得到对象,然后将它赋给模块对象exports
+        核心模块:
+          javascript核心模块的编译过程:
+            先转存为c/c++代码,编译成功后,缓存在NativeModule._cache对象上,通过process.binding('natives')取出
+          c/c++核心模块的编译过程:
+            ...
+            require('os')<-NativeModule.require('os')<-process.binding('os')<-get_builtin_module('node_os')<-NODE_MODULE(node_os, reg_func)
+    在node中,模块分为两种:
+      1.核心模块 // 核心模块在node源代码的编译过程中,编译成了二进制执行文件。
+                    在启动的时候,就被加载进了内存中,所以没有了文件定位和编译。
+                    执行的过程,而且在路径分析中优先判断,所以在加载速度上是最快的
+      2.文件模块 // 用户编写的模块称为文件模块,而文件模块需要完整的解析过程
+    加载机制:
+      优先从缓存加载
+      会对引入过的模块进行缓存,以减少二次引入时的开销。也就是说,所有的require对
+      相同模块的二次加载都一律采用缓存优先的方式,这是第一优先级。不同的是,核心模
+      块的缓存检查先于文件模块的缓存检查。
+      
+简单总结整过过程:
+  模块:内建模块->核心模块->文件模块
+  加载优先从缓存中读取
+  要是缓存中没有,则按照以下方式查找
+  一.路径分析
+    1.核心模块
+      直接从内存中读取
+    2.自定义模块
+      按照
+        当前目录
+        父目录
+        ...
+        根目录
+        查找
+  二.文件定位
+    扩展名->package.json->index
+  三.编译执行
+    

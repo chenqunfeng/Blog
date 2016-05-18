@@ -1,0 +1,17 @@
+PS：以下两种交换方法只适用于交换数字,因为两种运算方法都是基于数字的基础
+异或法
+  a = a ^ b
+  b = b ^ a
+  a = a ^ b
+  解释过程:
+    a = a ^ b
+    b = b ^ a = b ^ a ^ b = a
+    a = a ^ b = a ^ b ^ a = b
+加减法
+  a = a + b
+  b = a - b
+  a = a - b
+  解释过程:
+    a = a + b
+    b = a - b = a + b - b = a
+    a = a - b = a + b - a = a

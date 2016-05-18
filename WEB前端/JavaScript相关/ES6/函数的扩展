@@ -1,0 +1,200 @@
+前言：
+或许篇幅会过长，所以便在开头先点出下面几个重点：
+  1. 函数默认值应用场景
+  2. rest参数说明
+  3. 箭头函数及其注意点
+  4. 函数绑定::
+  5. 尾调用优化
+正文：
+一、函数默认值
+  1. 函数默认值
+    function test(x = 1, y = 2){} //一般写法
+    function test({x = 1, y = 2}){} //解构赋值写法
+  2. 函数默认值导致函数length属性的变化
+    (function (x){}).length // 1
+    (function (x = 5) {}).length // 0
+    length的意义：函数预期传入的参数个数，而当使用了默认值，这说明这个参数不是预期传入参数，因此发生变化。
+  3. 作用域问题
+    若函数默认值不是一个常量，而是一个变量，则这个变量的解析过程也符合作用域规则。
+    例子1
+      var x = 1;
+      function test(x, y = x){
+        console.log(y)
+      }
+      test(2) // 2
+    例子2
+      var x = 1;
+      function test(y = x){
+        let x = 2;
+        console.log(y)
+      }
+      test(2) // 1
+    例子3
+      function test(y = x){
+        let x = 2;
+        console.log(y);
+      }
+      test() // error
+  参数默认值的一个应用场景：
+    例子4
+      function test(x = 1){ console.log(x) }
+      test()
+      test(1)
+    以上两种调用方式在javascript都不会有任何问题，但是如果我们要指定某些参数不能忽略，类似像C语言，若参数不符编译都不能通过。
+    当然在javascript中不能做到C语言那种程度，但是我们可以利用函数默认值来抛出一个错误，做法如下。
+    例子5
+      function error() {
+        throw new Error("Missing Parameter");
+      }
+      function test(x = error()){
+        console.log(x)
+      }
+      test() // Error:Missing Parameter
+      test(1) // 正确
+    利用函数默认值和错误抛出，便做到了参数限制。
+  二、rest参数
+    function test(...value){}
+    rest参数的形式为"...变量名"，用于获取函数多余参数，而参数返回的是一个数组。功能上与arguments相似
+    arguments和rest相同功能的两种写法
+    // arguments写法
+    function test(){
+      return [].slice.call(arguments).sort()
+    }
+    // rest写法
+    const test = (...numbers) => numbers.sort()
+    rest参数后不能再出现其他参数，如下
+    function test(...a, b){} // 报错
+    同时，关于"一"中提到的length变量，rest参数也不在其计算范围内
+  三、扩展运算符
+    扩展运算符"..."，将一个数组转为用逗号分隔的参数序列
+    console.log(...[1,2,3]) // 1, 2, 3
+    扩展运算符的应用场景：
+      1.合并数组
+        var test = [4,5,6]
+        // ES5
+        [1,2,3].concat(test)
+        // ES6
+        [1,2,3 ...test]
+      2.解构赋值中的使用
+      3.字符串一键转为数组
+        [..."test"] // ["t", "e", "s", "t"]
+  四、name属性
+    name属性，返回该函数的函数名。
+    其实该属性在ES6中已经存在，但是并不是真正的标准，在使用上也会出现一些问题
+    例子6
+      function test() {}
+      // ES5 ES6
+      test.name // test
+    例子7
+      var test = function () {}
+      //ES5
+      test.name // ""
+      //ES6
+      test.name // "test"
+    例子8
+      var test = function test1() {}
+      // ES5 ES6
+      test.name // "test1"
+    例子9
+      (new Function).name // "anonymous"
+    例子10
+      function test() {}
+      test.bind({}).name //"bound test"
+      bind返回的函数，name会加上"bound"前缀
+  五、箭头函数
+    箭头：=>，ES6中允许使用箭头来定义函数
+    // ES5
+    var a = function(b){
+      return b;
+    }
+    // ES6
+    var a = b => b
+    PS:使用箭头函数需要注意的几个点
+      1.关于箭头函数内的this对象问题，this对象是定义时所在的对象，而不是使用时所在的对象
+        function test(){
+          setTimeout( () => {
+            console.log(this.id)
+          }, 0)
+        };
+        var id = 1;
+        test({id:2}); // 2
+        如果还是按照ES5中的标准，此时setTimeout中的this对象指向window，所以结果应该是1；但是因为箭头函数内的this对象
+        是定义时所在的对象，所以结果是2。
+      2.箭头函数定义的函数不能被当作构造函数，也就是说不能使用new命令，否则会抛出一个错误
+      3.箭头函数内不存在arguments对象，但是可以使用rest参数
+      4.不可以使用yield命令，因此箭头函数不能用作Generator函数
+  六、函数绑定
+    函数绑定运算符是并排的两个双冒号"::"，左边是一个对象，右边是一个函数，执行时会自动把左边的对象作为上下文环境，
+    绑定到右边的函数上面；如果左边为空，右边是一个对象的方法，则等于将该方法绑定在该对象上面；绑定最后返回原对象，
+    即左边的对象。
+    例子11
+      var log = ::console.log
+      ===>等同于
+      var method = console.log.bind(console)
+  七、尾调用优化
+    尾调用由于是函数的最后一步操作，所以不需要保留外层函数的调用帧，因为调用位置、内部变量等信息都可以被优化，只要直接
+    用内层函数的调用帧取代外层函数的调用帧就行。
+    例子12
+      function test(){
+        var x = 1;
+        var y = 1;
+        return test1(x+y);
+      }
+      test();
+      ===>等同于
+      function test(){
+        return test1(3)
+      }
+      test();//即在尾调用优化下，test1的调用帧替代了test的调用帧而其他多余的如x和y则被优化掉了。
+    尾调用优化的应用场景：
+      递归函数：递归函数十分消耗内存，若你的调用过程十分庞大，那么你可能需要用很多的内存去维护这一个个调用帧。
+      例子13
+        function factorial(n) {
+          if (1 === n) {
+            return 1;
+          }
+          return n * factorial(n - 1);
+        }
+        factorial(5) // 120
+        计算n的阶乘，需要同时保存n个调用帧，复杂度为O(n)
+      但是如果改用尾递归，也就是使用尾调用优化，那么我们实际上只保存了一个调用记录，也就是最后结果的记录，复杂度为O(1)
+      例子14
+        function factorial(n, total) {
+          if (1 === n) {
+            return total;
+          }
+          return factorial(n - 1, n * total);
+        }
+        factorial(5, 1) // 120
+        ===>等同于
+        function factorial(n, total) {
+          return 120;
+        }
+        factorial(5, 1)
+      PS:但是尾调用优化只在严格模式下开启，正常模式无效
+         因为在正常模式下，函数内部存在两个变量，可以跟踪函数的调用栈
+         -- func.arguments: 返回调用时函数的参数
+         -- func.caller:    返回调用当前函数的那个函数(这个对象可以利用来remove掉使用匿名函数注册的事件)
+         而在尾调用优化发生时，函数的调用栈会被改写，因此以上两个变量就会失真，而严格模式下会禁用这两个
+         变量，所以尾调用优化仅在严格模式下生效。
+         例子15
+          function test() {
+            "use strict";
+            test.caller;    // error
+            test.arguments; // error
+          }
+          test();
+    尾调用优化的实现：
+      1.将递归更改为循环- -，通俗易懂
+      2.在递归中要执行递归的地方返回一个函数，而不是调用函数，则可以避免调用栈过大的问题
+        例子16
+          function test(x,y){
+            if (x < 100) {
+              return test.bind(null, x++, y--);
+            } else {
+              return x;
+            }
+          }
+          
+        
+    

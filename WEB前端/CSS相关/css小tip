@@ -1,0 +1,10 @@
+一些觉得不错的CSS小常识
+1.两段对齐
+text-align:justify;
+text-justify:inter-ideogra;
+2.鼠标不允许点击
+cursor:not-allowed;
+只是样式变化，没有实际上不允许被点击的功能
+3.placeholder占位符颜色自定义
+input:-moz-placeholder { color: #369; }
+::-webkit-input-placeholder { color:#369; }

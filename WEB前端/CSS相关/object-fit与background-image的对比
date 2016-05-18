@@ -1,0 +1,16 @@
+object-fit:
+  object-fit:fill | contain | cover | none | scale-down
+  fill:此值为boject-fit的默认值，替换内容的大小被设置为填充元素的内容框，也就是说，元素的内容扩大到完全填充容器的外形尺寸，
+       即使这打破其内在的宽高比。
+  contain：替换元素内容大小保持长宽比例填充元素内容容器，其具体对象大小被解析为一个包含元素的宽度和高度。也就是说，如果你在
+           替换元素上设置一个明确的高度和宽度，此值将导致内容大小，完全在固定的比例显示，但仍在元素尺寸内显示。
+  cover：替换元素内容大小保持长宽比例填充元素内容容器，其具体对象大小被解析为覆盖整个元素的宽度和高度。也就是说，替换元素内
+         容大小保持长宽比，但改变宽度和高度，以便完全覆盖内容元素。
+  none：替换元素内容不调整大小以适应内部元素的容器，内容完全忽略设置在元素上的任何高度和权重，并且仍在元素尺寸内显示。
+  scale-down：当内容大小设置了non或contain，将导致具体对象变得更小。
+  更多可以查看 http://www.w3cplus.com/css3/css3-object-fit-and-object-position-properties.html
+background-size:
+  background-image
+  background-position
+在实际的试验效果中,object-fit与background-size效果相近,只是在一些显示效果上有一定的小区别
+个人看法,object-fit的效果可以通过background-size来实现,但是object-fit是作用在标签容器层面上,而不是背景

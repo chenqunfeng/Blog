@@ -1,0 +1,35 @@
+惰性载入函数
+    惰性载入表示函数执行的分支仅会发生一次。
+    例如
+    function ajax(){
+      if (condition1) return result1;
+      else if (condition2) return result2;
+    }
+    在这样的函数体中，我们只要调用ajax这个函数，都会进行条件判断，而多执行了一个if，也比没有多执行这个if慢。
+    所以，如何解决这个问题？
+    javascript高级教程中，给出了两种解决方案
+    1.在函数被调用时再处理函数。也就是说，在第一次调用的过程中，原函数会被函数体内的某个合适的分支覆盖，这样在以后的调用中便不会重复调用分支了
+      function ajax(){
+        if(condition1) ajax = function(){}
+        else if (condition2) ajax = function(){}
+        return ajax();
+      }
+    2.在声明函数时就指定适当的函数。也就是说，利用函数表达式，执行在第一次加载的时候就得到适当的函数，虽然这样在第一次加载的时候会损失一点性能
+      var ajax = (function(){
+        if(condition1) return function(){}
+        else if (condition2) return function(){}
+      })
+    
+    总结：其实这也跟缓存的思想差不多，减少多余的执行代码
+函数绑定
+  function bind(fn, context){
+    return function(){
+      return fn.apply(context, arguments);
+    }
+  }
+  在bind中创建一个闭包，闭包使用apply调用传入的函数，并给apply()传递context对象和参数。
+  可以保持函数的指定环境。
+  ECMA5提供了bind()函数，a.bind(handler)
+  但是，使用了函数绑定的花销相较于普通函数的消耗更大
+函数柯里化
+  

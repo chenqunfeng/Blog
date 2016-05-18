@@ -1,0 +1,25 @@
+1.回调函数
+  $.ajax
+   ...
+   success:(data)->
+     callback()
+  callback ()->
+    console.log "this is callback"
+2.事件监听
+  利用发布/订阅模式
+    var Pub = {
+      pubish () ->
+        ...
+        发布信号
+      subscribe ()->
+        ...
+        接受信号
+    }
+    Pub.subscribe("test",()->
+      console.log "subscribe"
+    )
+    Pub.publish("test") // "subscribe"
+3.Promises对象
+  f1().then(f2).then(f3) ...
+4.ES6中的Generator函数
+    

@@ -1,0 +1,131 @@
+1.label与input配合使用
+  <label for="username">name</label>
+  <input id="username">
+  label上的for可以增大input的焦点范围
+2.label与input的位置
+  这两者的大小应该足够大，能够方便被用户所接触到。
+  两个小原则：
+    1.当屏幕分辨率小时，标签应该在输入元素上方
+    2.当屏幕分辨率大时，标签应该是载入元素的左边
+  应该确保在input输入时，令和input配合使用的label同时可见，提升用户体验
+3.使用占位符(placeholders)
+  placeholders属性会提醒用户在input框中输入的正确格式
+  <input placeholder="HH:MM:SS">
+4.自动补全
+  <form autocomplete="on|off">
+  在表单form中使用autocomplete便可以开启和关闭form表单中的自动补全功能
+  而对于不需要补全的input，则可以直接autocomplete="off"关闭即可
+  PS：自动补全功能只在表单请求为post的时候才生效
+5.autofocus属性
+  设置该属性，桌面浏览器会自动聚焦到这个input，如搜索引擎的主页
+  但是移动设备会忽略该属性，防止键盘意外地出现
+6.type属性
+  选择最合适的type，可以提醒当前输入应该出现什么样的键盘布局类型，无须切换键盘
+  url：输入必须是有效的uri格式，如http://, ftp://
+  tel：没有特定的语法检查，但可以使用pattern属性来限定用户输入特定的格式
+  email：提醒浏览器在键盘上应该默认显示@按键
+  search：一个和系统搜索域样式一致的文本输入域
+  number：数字类型输入，整数或小数
+  range：数字输入,以滑块的形式呈现
+  datetime-local：日期和时间的输入，提供的时区是当时时区
+  date：日期的输入，不提供时区
+  time：时间的输入，不提供时区
+  week：星期的输入，不提供时区
+  month：月份的输入，不提供时区
+  color：颜色的选择
+7.datalist元素
+  <input list="tip">
+  <datalist id="tip">
+    <option value="white">
+    <option value="milk">
+  </datalist>
+  datalist为一个特定的input域提供一系列提示输入值
+8.表单验证
+  pattern属性：
+    pattern属性制定一个正则表达式来验证输入的数据
+    <input type="text" pattern="^\d{5,6}(?:[-\s]\d{4})?$">
+  required属性：
+    指定某个域不能为空
+  min，max，step属性：
+    可以为type类型像number，range甚至是data/time的输入，可以指定最大最小值，每一步的增减幅度
+  maxlength属性：
+    限定用户在输入框或者文本框中科输入的值的最大长度
+  novalidate属性：
+    不对form或者input域进行验证，但是并不会影响到伪类和javascript API进行表单合法性验证
+9.验证约束
+  willValidate属性：
+    对于可以提交的元素则为true，但是若被设置为disabled则为false，其他不可提交为false
+    document.getElementById("foo").willValidate
+  validity属性：
+    返回一个ValidityState对象，包含这个元素的验证状态信息
+    customError：
+      标识是否使用了自定义的验证消息，可以通过setCustomValidity()来设置验证消息
+      document.getElementById("foo").validity.customError; //false
+      document.getElementById("bar").setCustomValidity("Invalid");
+      document.getElementById("foo").validity.customError; //true
+    patternMismatch：
+      标识节点的value是否匹配它的pattern
+      document.getElementById("foo").validity.patternMismatch
+      为false时表示匹配成功，true时表示匹配失败
+    rangeOverflow：
+      标识节点的vlaue是否比它的max值要大
+      document.getElementById("foo").validity.rangeOverflow
+      为false时表示没有超过max，为true时表示超过max
+    rangeUnderflow：
+      标识节点的vlaue是否比它的min值要小
+      document.getElementById("foo").validity.rangeUnderflow
+      为false是表示不会小于min，为true时表示小于min
+    stepMismatch：
+      标识节点的value是否与它的step值不符合
+      document.getElementById("foo").validity.stepMismatch
+      为false时表示符合，为true表示不符合
+    tooLong：
+      标识节点的value长度是否超过maxlength
+      document.getElementById("foo").validity.maxlength
+    typeMismatch：
+      标识节点的value是否与type不匹配
+      document.getElementById("foo").validity.typeMismatch
+    valueMissing：
+      标识节点是否有required却没有值
+      document.getElementById("foo").validity.valueMissing
+    valid：
+      标识是否所有的验证提交都满足
+      document.getElementById("foo").validity.valid
+  validationMessage属性：
+    验证出错时的提示信息，如果DOM节点不需要验证或者节点节点包含正确的内容，那么便会被设置为空
+    document.getElementById("foo").validationMessage
+  setCustomValidity()：
+    该方法改变了validationMessage的值，也允许自己添加自定义的验证规则，设置为空表示验证正确
+  checkValidity()：
+    在验证内容正确的时候会返回true，否则返回false
+    document.getElementById("foo").checkValidity()
+10.实时地显示反馈
+  伪类：
+    :valid，当用户完成了一个输入域所有输入验证的要求，就明确地位该输入设置样式
+    :invalid，与valid伪类相反
+      PS：因为是立即验证，也就可能会在用户一进去表单页面的时候，用户还没填写表单，表单域就被标识为不合法，这将影响用户体验。
+      所以应该结合css和javascript，在用户访问过该域以后才显示不合法的样式
+      var inputs = document.getElementsByTagName("input");
+      var inputs_len = inputs.length;
+      var addDirtyClass = function(evt) {
+        sampleCompleted("Forms-order-dirty");
+        evt.srcElement.classList.toggle("dirty", true);
+      };
+      for (var i = 0; i < inputs_len; i++) {
+        var input = inputs[i];
+        input.addEventListener("blur", addDirtyClass);
+        input.addEventListener("invalid", addDirtyClass);
+      }
+    :required，当一个输入元素有required属性的时候，就明确地为该输入设置样式
+    :optional，当一个输入元素没有required属性的时候，就明确地位该输入设置样式
+    :in-range，当一个输入元素的值是数字并数字在限定范围内的时候，就明确地位该输入设置样式
+    :out-of-range，当一个输入元素的值是数组并数字超过了限定范围的时候，就明确地位该输入设置样式
+11.requestAutocomplete
+  简化支付流程，提高用户体验
+  隐藏支付表单并直接引导到确认页面
+  确保输入域包含恰当的autocomplete属性
+12.accept
+  <input type="file" accept="audio/mp3">
+  accept字段声明的格式可以让上传时浏览的文件为该格式
+  但是在IE和FF下有兼容问题
+    

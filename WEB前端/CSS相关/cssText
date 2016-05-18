@@ -1,0 +1,10 @@
+正常情况下
+  如果我们想要通过内联样式改变一个元素的width和height
+  我们会使用
+    object.style.width = "100px"
+    object.style.height = "100px"
+    但是,这样做会造成一个比较大的损耗问题,你在进行width的赋值以后,页面会进行一次重绘,而进行height赋值时,又进行了一次重绘。
+    可以想一下,如果有很多次这样的直接属性赋值操作,造成的重绘代价会很大
+  所以,我们应该一次性完成这些动作,而cssText则是这一次主题的主角
+    object.style.cssText = "width:100px;height:100px;"
+    这样,一次赋值,一次重绘,解决。

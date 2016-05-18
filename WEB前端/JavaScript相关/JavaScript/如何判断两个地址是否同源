@@ -1,0 +1,53 @@
+首先，我们要知道同域的概念是什么：
+  同域要求两个站点同协议、同域名、同端口。
+  例子：
+    http://www.example.com
+  同协议：
+    我们很多人都知道，浏览器是使用http无状态协议的，而http就是其中另一种协议，另一种则是https
+    所以
+      http://www.example.com
+      https://www.example.com
+      就是不同域下的
+  同域名：
+    在例子中，www便是域名
+    http://www.example.com
+    http://foo.example.com
+    http://example.com
+    可以看出www和foo分别是不同的域名，而对于最后一个，它属于顶级域名，因此也是在不同域名的范畴
+    关于顶级域名和www一类域名所牵扯出的问题：
+      （可以选择性观看）
+      先普及DNS记录中几个概念
+        A纪录：
+          也就是Adress记录，是用来指定主机名（或域名）对应的IP地址记录。
+          通俗点讲就是将一个站点与一个IP地址绑定，让你可以访问该站点的时候可以通过A记录将站点解析为IP地址，然后便可以进行寻址。
+          例子：
+            www.example.com 192.168.1.1
+            在DNS服务器中增加这样一条A记录之后，当你访问www.example.com之后便可以被解析为192.168.1.1然后进行寻址
+        CNAME记录：
+          也称为规范名字，这种记录允许将多个名字映射到同一台计算机服务器上，通常是用于同时提供WWW和MAIL服务的计算机。
+          通俗点将就是别名记录，你可以将多个名称指向同一台服务器。
+          例子：
+            比如你有一台server服务器
+            首先，增加A记录
+              server.example.com 192.168.1.1
+            然后，绑定WWW和MAIL服务
+              www.example.com server.example.com
+              mail.example.com server.example.com
+              这样，在使用www和mail服务的时候，都会通过CNAME记录解析到server.example.com上，再从A记录中查找到192.168.1.1便可以正确
+              找到server服务器所在的正确位置。
+        MX记录：
+          即Mail Exchanger，邮件交换记录，它指向一个邮件服务器，用于电子邮件系统发邮件时根据收信人的地址后缀来定位邮件服务器。
+          例子：
+              A记录:server.example.com 192.168.1.1
+              CNAME记录:mail.example.com server.example.com
+              MX记录:example.com mail.example.com
+              收信人:user@example.com
+              这个时候会查找example.com这个域名的MX记录，如果存在就会根据MX记录找到对应的mail.example.com，而mail.example.com可能
+              是一个CNAME记录，所以还会从CNAME记录中查找到server服务器，最后才去A记录中查找server.example.com的IP地址。
+        NS记录：
+          即Name Server，域名服务器记录，用来指定该域名由哪个DNS服务器来进行解析。
+  同端口：
+    http://www.example.com
+    http://www.example.com:8080
+    因为以上端口不同，所以也属于不同域
+  那么，排除上面三种情况以后，剩下的便是同域下的了。

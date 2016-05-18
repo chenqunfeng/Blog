@@ -1,0 +1,12 @@
+事件的添加与移除
+  node.addEventListener(event.type,handler)
+  node.removeEventListener(evevt.type,handler)
+以上便是我们常用的事件的添加与移除。
+那如果在某种需求下,我们不能使用函数句柄,而不得不使用匿名函数,那如何能够移除添加的事件呢？
+同理,只要我们能获取到addEventListener中匿名函数的句柄,便可以移除添加的事件
+做法：
+  node.addEventListener(event.type,function(){
+    window.handler = arguments.callee;//这里的arguments.callee便是这个函数的句柄
+  })
+  node.removeEventListener(event.type,window.handler)
+  over！~

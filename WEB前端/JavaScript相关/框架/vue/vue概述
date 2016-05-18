@@ -1,0 +1,18 @@
+vue.js 是一个构建数据驱动的web界面的库，它本身不是一个兼顾所有方面的框架，而只是一个聚焦于视图层。
+
+与Angular相比
+对于脏检查的问题，它根本就不使用脏检查。
+官方说明：
+  Vue.js 则根本没有这个问题，因为它使用基于依赖追踪的观察系统并且异步列队更新，所有的数据变化都是独立地触发，
+  除非它们之间有明确的依赖关系。唯一需要做的优化是在 v-for 上使用 track-by
+  
+与React相比
+官方说明：
+  Vue.js 不使用 Virtual DOM 而是使用真实 DOM 作为模板，数据绑定到真实节点。Vue.js 的应用环境必须提供 DOM。
+  但是，相对于常见的误解——Virtual DOM 让 React 比其它的都快， Vue.js 实际上性能比 React 好，而且几乎不用手工优化。
+  而 React，为了最优化的渲染需要处处实现 shouldComponentUpdate 或使用不可变数据结构。
+  
+与其他框架的比较
+。。。
+详情在官网
+http://cn.vuejs.org/guide/comparison.html

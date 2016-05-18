@@ -1,0 +1,42 @@
+1.事件队列
+  调用setTimeout的时候,会有一个延时事件排入队列,然后setTimeout调用之后的那行代码运行,接着是再下一行代码,直到再也没有任何代码.
+  这个时候javascript才会询问队列里是否有事件需要执行
+  
+  var start = new Date;
+  setTimeout(function(){
+    var end = new Date;
+    console.log('Time elapsed:', end - start, 'ms');
+  }, 0);
+  while (new Date - start < 1000) {};
+  运行到setTimeout函数行,会将setTimeout这个事件压入队列中,然后继续往后执行.
+  理论上,setTimeout只是一个0秒的延时,所以应该会立马得到执行,但是由于事件队列的机制,会一直执行while循环,直到while循环跳出才会去执行队列的事件
+  
+  所以,这里的输出结果在1秒之后,当然并不是准确的1秒,会比1秒大.
+
+2.异步计时函数
+  
+  setTimeout和setInterval
+  
+  var fireCount = 0;
+  var start = new Date;
+  var timer = setInterval(function() {
+    if (new Date-start > 1000) {
+      clearInterval(timer);
+      console.log(fireCount);
+      return;
+    }
+    fireCount++;
+  }, 0);
+  
+  这里的执行次数大概为200次/秒。
+  而直接使用while循环则可以达到400万/次。
+  
+  而究其原因是这两个计时函数原本就是要被设计成这样慢吞吞的。(执行频率4毫秒)
+  
+  那么问题来了？如何做到更细粒化的计时呢？
+    在Node中,process.nextTick频率超过10万/次
+    现代浏览器中(包含IE9+),有一个requestAnimationFrame函数,可以做到
+      ①允许以60+帧/秒的速度运行js动画
+      ②避免了后台选项卡运行这些动画,从而节约CPU周期
+
+3.

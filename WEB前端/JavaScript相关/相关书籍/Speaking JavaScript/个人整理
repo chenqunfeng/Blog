@@ -1,0 +1,132 @@
+1.statements 和 expressions
+  javascript语法中有两个主要的语法标准范畴：statements 和 expressions
+  statements：
+    完成"do things"的任务
+    如 var foo //声明了变量foo
+  expressions:
+    完成"produce values"的任务
+    如 3 * 7 //计算了 3 * 7 的值
+  ## 这一点暂时不理解
+  两者区别的表现:
+    如分支判断
+    statements
+      var x;
+      if (y >= 0){
+        x = y;
+      } else {
+        x = y;
+      }
+    expressions
+      var x = y >= 0 ? y : -y;
+    而在这两者之中，只有expressions能作为函数的传参来使用，但是statements不能
+2.function
+  enforcing an arity
+    固定参数数量，让不符合参数数量的直接抛出异常
+    function pair(x,y){
+      if(arguments.length !== 2){
+        throw new Error('Nedd exactly 2 arguments');
+      }
+      ...
+    }
+    这里的arguments不是一个数组，而是一个类数组
+  exception handling
+    异常处理
+    function getPerson(id) {
+      if (id < 0) {
+        throw new Error('ID must not be negative: '+id);
+      }
+      return { id: id }; // normally: retrieved from database
+    }
+    若输出不符合的id，则直接抛出错误，而不会造成后面的错误，而正确的id则可以正常执行。
+  
+  extracting methods 提取出方法
+  var jane = {
+    name: "jane",
+    describe: function(){
+      return "Person named" + this.name;
+    }
+  };
+  当你直接从jane中提取出describe方法，它并不能按照你预期的那样执行
+  var func = jane.describe;
+  func() //TypeError: Cannot read property "name" of undefined
+  可以通过bind方法来解决这个问题
+  var func2 = jane.describe.bind(jane);//这里绑定的jane是拥有这个describe和里面的name值的对象
+  func2() // "Person named Jane"
+3.Array
+  .length 具有截断功能
+  如
+  a = [1,2,3]
+  a.length = 1
+  a // [1]
+  a.length = 3
+  a // [1,undefined,undefined]
+4.undefined 和 null
+  最初设计
+    null是一个表示"无"的对象，转为数值时为0
+    undefined是一个表示"无"的原始值，转为数值时为NaN
+  后来
+    null表示"没有对象"，即该处不应该有值
+      ①作为函数的参数，表示该函数的参数不是对象
+      ②作为对象原型链的终点
+    undefined表示"缺少值"，就是此处应该有一个值，但是还没有定义
+      ①变量被声明了，但没有赋值时，就等于undefined
+      ②调用函数时，应该提供的参数没有提供，该参数等于undefined
+      ③对象没有赋值的属性，该属性的值为undefined
+      ④函数没有返回值时，默认返回undefined
+  在进行undefined的比较的时候，需要注意一些问题
+    虽然在ec5中undefined这个关键字就被修改为只读
+    但是在 x === undefined的比较是比较不安全的
+    应该换为
+    x === void 0
+    或者
+    (function(undefined){
+      if (x === undefined)
+    }());
+5.boolean
+  undefined,null,"",0,NaN => false
+  这里面，只有空字符串才会转为false，其余都为true，就算是"false"
+6.array
+  [1,2] + [3] => "1,23"
+  String([1,2]) => "1,2"
+  String([3]) => "3"
+7.一些需要注意的比较
+  2 == true // 2===1
+  2 == false // 2===0
+  1 == true // 1===1
+  0 == false // 0===0
+  '' == false // 0===0
+  '1' == true // 1===1
+  '2' == true // 2===1
+  'abc' == true // NaN===1
+  '123' == 123 // 123===123
+  {} == '[object Object]' // '[object Object]'==='[object Object]'
+  ['123'] == 123 // 123===123
+  [] == 0 // 0===0
+  If the two operands are not of the same type, JavaScript converts the operands then applies strict comparison.
+  If either operand is a number or a boolean, the operands are converted to numbers if possible; else if either
+  operand is a string, the other operand is converted to a string if possible. If both operands are objects,
+  then JavaScript compares internal references which are equal when operands refer to the same object in memory.
+  意思也就是，若在比较中，其中任何一个值为number类型或者boolean类型，则比较参数会转化为number再进行比较;
+  其次，如果比较参数有一个为string，则另一个参数也转为string;
+  最后，如果比较参数都为object，则会比较object内部参数看是否相等。
+8.关于void
+  void 0 => undefined
+  void (4) => undefined
+  void 4 + 7 => (void 4)+7 => NaN
+  为什么会有void这个关键字呢？
+  I added the void operator to JS before Netscape 2 shipped to make it 
+  easy to discard any non-undefined value in a javascript: URL
+                                  ---- JavaScript creator Brendan Eich
+  用处：
+    ①用来替代undefined
+    ②<a href="javascript:void window.open("http://example.com/")">
+     可避免a标签的默认行为，例如滚动到页面顶部，刷新等
+    ③匿名函数的前缀
+     !function(){
+     }()
+     void function(){
+     }()
+     效果等同于
+     (function(){
+     }())
+  

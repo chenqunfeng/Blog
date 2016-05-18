@@ -1,0 +1,34 @@
+记录下这个点也是因为自己在实际问题中遇到的坑引起的,觉得十分有意义,所以小小纪录一下.
+
+代码如下
+  前端 IP:8000
+  后台 IP:8080
+  (以下代码为coffeescript)
+  localStorage.setItem("visitSource") = "test"
+  $.ajax
+    type: "post"
+    url: "/test"
+    data: {
+      source: localStorage.getItem("visitSource") // test
+    }
+    success: (data) ->
+      if "success" is data.status
+        isUseTest = data.test
+        localStorage.setItem("test",1) // test:1
+        # 首页展示的abtest或者banner都需要在获取isUsedTest之后才能实例化
+        test(isUseTest)
+    error: (err) ->
+      console.log err
+  test = (isUseTest) ->
+    console.log localStorage.getItem("test") // null
+  
+  为什么test函数中的console.log是null呢?而不是1?在ajax中不是已经设置了test字段了么?
+  
+  localStorage只针对同一个域下共通数据,那么问题来了,这里是因为什么原因呢?当然是因为是处在不同的域下。
+  你他妈在逗我?这怎么能不是同一个域下的呢？
+  不知道有没有人注意到前端和后台的端口号并不相同,而ajax请求的successCb的执行域是在？
+  没错,或许你猜对了,successCb的执行域是在8080端口,而理所应当的,在successCb中设置的test字段只能在8080端口上互通,
+  而不能跟前端8000端口互通,这就导致了test函数中的console.log为null
+  那么为何ajax中的data中可以拿到visitSource字段呢？
+  当然还是因为作用域,在设置data的时候,当前作用域还是在前端的8000端口下
+  
