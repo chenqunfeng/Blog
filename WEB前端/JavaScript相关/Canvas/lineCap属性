@@ -1,0 +1,13 @@
+lineCap
+  设置或返回线条末端线帽的样式。
+  butt：
+    默认。向线条的每个末端添加平直的边缘。
+  round：
+    向线条的每个末端添加圆形的线帽。
+  square：
+    向线条的每个末端添加正方形线帽。
+  PS：round和square会使线条略微变长。
+  使用方法：
+    var Canvas = document.getElementById("Canvas");
+    var Context2D = Canvas.getContext("2d");
+    Context2D.lineCap = "round"
