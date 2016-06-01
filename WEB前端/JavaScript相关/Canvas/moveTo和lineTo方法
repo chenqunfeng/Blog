@@ -1,0 +1,14 @@
+默认情况下，如果画布元素在进行操作之前，操作原点都是在canvas的左上角(0,0)位置。
+moveTo:
+  moveTo(x1,y1)
+  把画笔移动到x1,y1点
+lineTo:
+  lineTo(x2,y2)
+  从上一个moveTo的点(x1,y1)到(x2,y2)画一条线
+stroke:
+  stroke()
+  stroke的作用是将moveTo和lineTo的组合效果在canvas上描绘出来，因为执行完前两步之后，canvas并不会把线条描绘出来，最终的执行权在stroke上。
+一个有趣的应用场景：
+  虽然乍一看moveTo和lineTo的组合只能画出线条而已，但是我们可以搭配使用globalCompositeOperation，便可以轻松做出刮刮乐的效果。
+  原理：
+    globalCompositeOperation = "destination-out"; //
