@@ -1,10 +1,24 @@
 一些觉得不错的CSS小常识
 1.两段对齐
-text-align:justify;
-text-justify:inter-ideogra;
+  text-align:justify;
+  text-justify:inter-ideogra;
 2.鼠标不允许点击
-cursor:not-allowed;
-只是样式变化，没有实际上不允许被点击的功能
+  cursor:not-allowed;
+  只是样式变化，没有实际上不允许被点击的功能
 3.placeholder占位符颜色自定义
-input:-moz-placeholder { color: #369; }
-::-webkit-input-placeholder { color:#369; }
+  input:-moz-placeholder { color: #369; }
+  ::-webkit-input-placeholder { color:#369; }
+4.默认滚动条样式
+  ::-webkit-scrollbar-thumb{
+      -webkit-border-radius: 6px;
+      -moz-border-radius: 6px;
+      border-radius: 6px;
+      border: 1px solid rgba(0, 0, 0, 0);
+      background-clip: content-box;
+      background-color: #5d5d5d;
+  }
+  ::-webkit-scrollbar{
+      -webkit-appearance: none;
+      width: 12px;
+      background-color: #e8e8e8;
+  }
