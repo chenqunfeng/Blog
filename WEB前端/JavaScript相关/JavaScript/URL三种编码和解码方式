@@ -1,3 +1,25 @@
 escape 和 unescape
 encodeURI 和 decodeURI
 encodeURIComponent 和 decodeURIComponent
+以上三个函数都是对字符串编码和解码函数，但是也各有各的区别。
+escape:
+  返回值：
+    返回已编码的string的副本，其中某些字符被替换成了十六进制的转义序列。
+  说明：
+    该方法不会对ASCII字母和数字和下面这些ASCII标点符号进行编码 -_.!~*'() 进行编码。
+encodeURI:
+  返回值：
+    URIstring的副本，其中的某些字符将被十六进制的转义序列进行替换。
+  说明：
+    该方法不会对ASCII字母和数字和下面这些ASCII标点符号进行编码 -_.!~*'() 进行编码。
+    该方法目的是对URI进行完整的编码，因此对一下在URI中具有特殊含义的ASCII标点符号是不会进行转义的 ：；/?:@&=+$,#
+encodeURLComponent:
+  返回值：
+    URIstring的副本，其中的某些字符将被十六进制的转义序列进行替换。
+  说明：
+    该方法不会对ASCII字母和数字和下面这些ASCII标点符号进行编码(-_.!~*'())进行编码
+    其他字符（比如：；/?:@&=+$,#，这些用于分隔URI组件的标点符号），都是由一个或多个十六进制的转义序列替换的。
+总结:
+  escape()除了 ASCII 字母、数字和特定的符号外，对传进来的字符串全部进行转义编码，因此如果想对URL编码，最好不要使用
+  此方法。而encodeURI() 用于编码整个URI,因为URI中的合法字符都不会被编码转换。encodeURIComponent方法在编码单个
+  URIComponent（指请求参 数）应当是最常用的，它可以讲参数中的中文、特殊字符进行转义，而不会影响整个URL。
