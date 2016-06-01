@@ -27,7 +27,7 @@
          base64 = new Buffer(_r, "binary").toString("base64");
          return res.json({status: "success", base64: base64})
         }
-    })
+      })
     })
     
 以上两种情况和对应的解决方案其实都是一致的，就是通过将图片资源转为base64来避免跨域问题。
