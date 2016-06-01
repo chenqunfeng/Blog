@@ -18,5 +18,16 @@
 2.只有图片的url的情况
   这种情况下，因为前端无法读取文件资源，所以只能让后台配合，让后台根据图片url将其转为base64再返回给前端使用。
   具体代码(nodejs):
+    request = require('requeset') // request 模块
+    router("/base64").get(function(req, res, next){
+      url = "" // 图片url
+      options = {timeout: 8000, encoding: 'binary'}
+      request.get(url, options, function(_err, _res, _r){
+        if (_r) {
+         base64 = new Buffer(_r, "binary").toString("base64");
+         return res.json({status: "success", base64: base64})
+        }
+    })
+    })
     
 以上两种情况和对应的解决方案其实都是一致的，就是通过将图片资源转为base64来避免跨域问题。
