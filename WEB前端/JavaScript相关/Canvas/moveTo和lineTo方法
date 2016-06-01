@@ -11,4 +11,15 @@ stroke:
 一个有趣的应用场景：
   虽然乍一看moveTo和lineTo的组合只能画出线条而已，但是我们可以搭配使用globalCompositeOperation，便可以轻松做出刮刮乐的效果。
   原理：
-    globalCompositeOperation = "destination-out"; //
+    /*
+      context: 画布
+      startPos: {left:x1,top:y1}
+      endPos: {left:x2,top:y2}
+    */
+    context.globalCompositeOperation = "destination-out"; 
+    //该属性会让只有在源图像外的目标图像才在画布上显现，也就是说，如果画布上已经涂满图像，
+    //那么新绘上去的线条只会起到清空当前线条应该存在位置的图像的效果。
+    context.moveTo(startPos.left, startPos.top);
+    context.lineTo(endPos.left, endPos.top);
+    context.stroke();
+    
