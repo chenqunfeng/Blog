@@ -22,4 +22,17 @@
 3.Promises对象
   f1().then(f2).then(f3) ...
 4.ES6中的Generator函数
+  首先关于Generator函数有以下几点要特别注意：
+    1.写法与普通函数差不多，但是带有一个'*'号，function* generator(){}，不能作为普通的构造函数，因为Generator总是返回遍历器对象，不是this对象，所
+    以也无法使用new命令。但是也可以采用变通的方式，先生成一个空对象，使用call方法绑定Generator函数内部的this。不过这样会引起一个无关的obj，可以将
+    call内的obj改成Generator的原型。利用这种办法，可以使用一个空的函数包裹并返回call方法，便可以使用new。
+    2.一般会与yield关键字搭配使用，而且yield关键字只能在Generator函数中使用，否则会报错，yield* 用法
+    3.运行Generator函数以后，会得到一个引用，let g = generator()，需要调用next方法来让Generator函数一步步执行，g.next()
+    4.next可以传参，next(true)，传入的值会作为前一次yield结果的返回值，因为next方法传参表示上一个yield的返回值，所以第一次使用next方法不能带有参数。
+    但是如果想要在第一次调用next方法时便能够传入一个输入值，可以在Generator函数外面包一层，然后先把第一次的next执行掉。
+    5.next不是唯一可以执行Generator函数的方法，使用循环遍历(for...of)Generator函数可以执行执行，但是当next方法返回的done为true时，循环便会终止，所
+    以使用循环遍历不能获取最后的return值
+    6.throw方法抛出的异常如果不会引起程序中断执行，则会执行一次next方法
+    7.return方法可以手动执行，提前终止Generator，执行效果与正常执行next方法遇到return值的效果一致。但是如果Generator函数内部有try...finally代码块，
+    则return方法会推迟到finally代码块执行完再执行。
     
