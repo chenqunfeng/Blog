@@ -16,5 +16,5 @@
   var isObject = isType("Object")
   var isString = isType("String")
   ...
-  这里，我们通过定义一个isType的闭包和利用toString方法来完成这个过程。
+  这里，我们通过定义一个isType的闭包和利用toString方法来完成这个过程，这其实是利用了柯里化，分别让isObject变量绑定isType函数时缓存了'Object'。
   
