@@ -35,4 +35,23 @@
     6.throw方法抛出的异常如果不会引起程序中断执行，则会执行一次next方法
     7.return方法可以手动执行，提前终止Generator，执行效果与正常执行next方法遇到return值的效果一致。但是如果Generator函数内部有try...finally代码块，
     则return方法会推迟到finally代码块执行完再执行。
+  function ajax(cb){
+    setTimeout(function(){
+      console.log('ajax success!');
+      cb && cb();
+    }, 1000);
+  };
+  function* gen(cb){
+    yield ajax(cb);
+    yield ajax(cb);
+    yield ajax(cb);
+  };
+  function run(generator){
+    let g = generator(callback);
+    function callback(){
+      g.next();
+    }
+    g.next();
+  };
+  run(gen);
     
