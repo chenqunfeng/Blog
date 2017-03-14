@@ -10,9 +10,9 @@ var isArray = function(obj) {
 }
 var Promise = function(resolver){
     /*
-        第一个promise的resolver必须为function
+        第一个promise的resolver若存在则必须为function
     */
-    if (!isFun(resolver)){
+    if (resolver && !isFun(resolver)){
         throw new TypeError('The first promise resolver must be resolver');
     }
     /*
@@ -47,8 +47,8 @@ var Promise = function(resolver){
             value = fn.call(promise, value) || value;
         }
         promise._value = value;
-        promise._resolves = undefined;
-        promise._rejects = undefined;
+        promise._resolves = [];
+        promise._status = "RESOLVED";
     };
     var reject = function(error){
         var fn;
@@ -56,10 +56,10 @@ var Promise = function(resolver){
             error = fn.call(promise, error) || error;
         }
         promise._error = error;
-        promise._resolves = undefined;
-        promise._rejcts = undefined;
+        promise._rejcts = [];
+        promise._status = "REJECTED";
     };
-    resolver(resolve,reject);
+    resolver && resolver(resolve, reject);
 }
 Promise.prototype.then = function(onResolved,onRejected){
     var promise = this;
@@ -121,7 +121,9 @@ Promise.prototype.all = function(promises){
         throw new TypeError('You must pass an array to all.');
     }
     return Promise(function(resolve,reject){
-        var result = [];
+        var result = [],
+            len = promises.length,
+            count = 0;
 
         function resolver(index) {
             /*
@@ -133,7 +135,7 @@ Promise.prototype.all = function(promises){
                 /*
                     通过数量标识来延后真正的all的resolve
                 */
-                index === len - 1 && resolve(result);
+                ++count === len && resolve(result);
             };
         }
 
@@ -141,7 +143,7 @@ Promise.prototype.all = function(promises){
             reject(reason);
         };
 
-        for (var i = 0, len = promises.length; i < len; i++) {
+        for (var i = 0; i < len; i++) {
             // 通过使用一个then来获取到promises中每一个的返回结果,最后再统一处理
             promises[i].then(resolver(i),rejecter);
         }
