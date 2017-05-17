@@ -22,3 +22,12 @@
       width: 12px;
       background-color: #e8e8e8;
   }
+  ::-webkit-scrollbar-corner {
+    background-color: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    border: 2px solid #4a4b4c;
+    border-radius: 2px;
+    background-clip: content-box;
+    background-color: #4a4b4c;
+  }
