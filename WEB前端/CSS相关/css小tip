@@ -31,3 +31,7 @@
     background-clip: content-box;
     background-color: #4a4b4c;
   }
+5.padding实现比例固定图片自适应布局
+  css中margin和padding属性垂直方向的百分比值都是相对于其父类的宽度计算的,若直接设置
+  div { padding-bottom: 100%; }
+  则其尺寸永远是1:1的正方形,依据这样的原理,我们可以轻易设置一个比例固定的自适应布局
