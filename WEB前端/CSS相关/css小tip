@@ -35,3 +35,17 @@
   css中margin和padding属性垂直方向的百分比值都是相对于其父类的宽度计算的,若直接设置
   div { padding-bottom: 100%; }
   则其尺寸永远是1:1的正方形,依据这样的原理,我们可以轻易设置一个比例固定的自适应布局
+6.unicode-range定制特定中文字符
+  @font-face {
+    font-family: BASE;
+    src: local("Microsoft Yahei");
+  }
+  @font-face {
+    font-family: quote;
+    src: local('SimSun');    
+    unicode-range: U+201c, U+201d;
+  }
+  .font {
+      font-family: quote, BASE;
+  }
+  以上的css代码可以让font标签中的双引号使用的是SimSun的双引号,而其他字符则使用微软雅黑
