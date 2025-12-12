@@ -1,0 +1,263 @@
+# 规范模式 & 策略模式（JS实现）
+本文整理了验证场景下**规范模式（Specification Pattern）** 和**策略模式（Strategy Pattern）** 的核心思路、代码实现及适用场景，均基于 JavaScript 编写。
+
+## 一、规范模式（Specification Pattern）
+### 1. 核心思路
+将复杂的业务规则（验证条件）封装为可组合、可复用的对象，通过 `and`/`or`/`not` 等逻辑组合多个验证规则，解决多条件组合验证的问题。
+- 定义抽象规范类（含 `isSatisfiedBy` 验证方法）；
+- 实现具体规范类（单个验证规则）；
+- 提供逻辑组合方法（`and`/`or`/`not`），实现规则复用与组合。
+
+### 2. 代码实现
+```javascript
+// 1. 基础规范类（提供逻辑组合方法）
+class Specification {
+  // 验证方法（子类实现）
+  isSatisfiedBy(obj) {
+    throw new Error("必须实现 isSatisfiedBy 方法");
+  }
+
+  // 与逻辑：当前规则 && 另一个规则
+  and(otherSpec) {
+    return new AndSpecification(this, otherSpec);
+  }
+
+  // 或逻辑：当前规则 || 另一个规则
+  or(otherSpec) {
+    return new OrSpecification(this, otherSpec);
+  }
+
+  // 非逻辑：!当前规则
+  not() {
+    return new NotSpecification(this);
+  }
+}
+
+// 2. 组合规范：AND 逻辑
+class AndSpecification extends Specification {
+  constructor(spec1, spec2) {
+    super();
+    this.spec1 = spec1;
+    this.spec2 = spec2;
+  }
+
+  isSatisfiedBy(obj) {
+    return this.spec1.isSatisfiedBy(obj) && this.spec2.isSatisfiedBy(obj);
+  }
+}
+
+// 3. 组合规范：OR 逻辑
+class OrSpecification extends Specification {
+  constructor(spec1, spec2) {
+    super();
+    this.spec1 = spec1;
+    this.spec2 = spec2;
+  }
+
+  isSatisfiedBy(obj) {
+    return this.spec1.isSatisfiedBy(obj) || this.spec2.isSatisfiedBy(obj);
+  }
+}
+
+// 4. 组合规范：NOT 逻辑
+class NotSpecification extends Specification {
+  constructor(spec) {
+    super();
+    this.spec = spec;
+  }
+
+  isSatisfiedBy(obj) {
+    return !this.spec.isSatisfiedBy(obj);
+  }
+}
+
+// 5. 具体验证规则（以用户注册验证为例）
+// 规则1：用户名长度≥6
+class UsernameLengthSpec extends Specification {
+  isSatisfiedBy(user) {
+    return user.username && user.username.length >= 6;
+  }
+}
+
+// 规则2：密码包含数字
+class PasswordHasNumberSpec extends Specification {
+  isSatisfiedBy(user) {
+    return user.password && /\d/.test(user.password);
+  }
+}
+
+// 规则3：邮箱格式合法
+class EmailFormatSpec extends Specification {
+  isSatisfiedBy(user) {
+    return user.email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(user.email);
+  }
+}
+
+// 6. 场景使用：用户注册验证
+function validateUserRegistration(user) {
+  // 组合规则：用户名合法 && (密码含数字 || 邮箱合法)
+  const validUsername = new UsernameLengthSpec();
+  const validPassword = new PasswordHasNumberSpec();
+  const validEmail = new EmailFormatSpec();
+  const combinedSpec = validUsername.and(validPassword.or(validEmail));
+
+  // 执行验证
+  const isPass = combinedSpec.isSatisfiedBy(user);
+  return {
+    pass: isPass,
+    message: isPass ? "验证通过" : "用户名长度不足，或密码无数字且邮箱格式错误"
+  };
+}
+
+// 测试案例
+const user1 = { username: "zhangsan", password: "123456", email: "test@xxx.com" };
+const user2 = { username: "zs", password: "abc", email: "test@xxx" };
+
+console.log(validateUserRegistration(user1)); // { pass: true, message: '验证通过' }
+console.log(validateUserRegistration(user2)); // { pass: false, message: '用户名长度不足，或密码无数字且邮箱格式错误' }
+```
+
+### 3. 适用场景
+- 表单验证（多规则组合，如“必填+长度≥6+包含特殊字符”）；
+- 订单状态校验（如“已支付+未发货+7天内下单”）；
+- 权限校验（如“管理员+部门A+操作时间在工作时段”）。
+
+## 二、策略模式（Strategy Pattern）
+### 1. 核心思路
+将**算法/逻辑**封装为独立的策略类，使它们可以互相替换，核心是“分离算法定义与算法使用”，解决多可选逻辑的灵活切换问题。
+- 定义策略接口（统一方法名，如 `validate`）；
+- 实现具体策略类（不同验证逻辑）；
+- 定义上下文类（接收策略对象，调用策略方法）。
+
+### 2. 代码实现
+以“表单不同字段的验证策略”为例：
+```javascript
+// 1. 具体验证策略（算法封装）
+const ValidationStrategies = {
+  // 策略1：必填项验证
+  required: {
+    validate(value) {
+      return !!value.trim();
+    },
+    message: "此字段不能为空"
+  },
+  // 策略2：手机号验证
+  mobile: {
+    validate(value) {
+      return /^1[3-9]\d{9}$/.test(value);
+    },
+    message: "手机号格式错误"
+  },
+  // 策略3：金额验证（正数）
+  amount: {
+    validate(value) {
+      const num = Number(value);
+      return !isNaN(num) && num > 0;
+    },
+    message: "请输入合法的正数金额"
+  },
+  // 策略4：邮箱验证
+  email: {
+    validate(value) {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+    },
+    message: "邮箱格式错误"
+  }
+};
+
+// 2. 上下文类（策略使用方）
+class Validator {
+  constructor() {
+    // 存储需要验证的字段规则
+    this.rules = [];
+  }
+
+  // 添加验证规则（字段名 + 策略 + 自定义提示）
+  add(fieldName, strategyName, message) {
+    const strategy = ValidationStrategies[strategyName];
+    if (!strategy) {
+      throw new Error(`不存在${strategyName}验证策略`);
+    }
+    this.rules.push({
+      fieldName,
+      strategy,
+      message: message || strategy.message
+    });
+  }
+
+  // 执行验证
+  validate(formData) {
+    for (const rule of this.rules) {
+      const value = formData[rule.fieldName];
+      const isValid = rule.strategy.validate(value);
+      if (!isValid) {
+        return {
+          pass: false,
+          field: rule.fieldName,
+          message: rule.message
+        };
+      }
+    }
+    return { pass: true, message: "所有字段验证通过" };
+  }
+}
+
+// 3. 场景使用：表单验证
+function validateForm() {
+  // 模拟表单数据
+  const formData = {
+    username: "", // 空值
+    phone: "13800138000", // 合法手机号
+    amount: "0", // 金额不合法
+    email: "test@xxx.com" // 合法邮箱
+  };
+
+  // 创建验证器并添加规则
+  const validator = new Validator();
+  validator.add("username", "required", "用户名不能为空");
+  validator.add("phone", "mobile");
+  validator.add("amount", "amount");
+  validator.add("email", "email");
+
+  // 执行验证
+  return validator.validate(formData);
+}
+
+// 测试
+console.log(validateForm()); 
+// { pass: false, field: 'username', message: '用户名不能为空' }
+
+// 修改表单数据后重新验证
+const validFormData = {
+  username: "zhangsan",
+  phone: "13800138000",
+  amount: "100",
+  email: "test@xxx.com"
+};
+const validator2 = new Validator();
+validator2.add("username", "required");
+validator2.add("phone", "mobile");
+validator2.add("amount", "amount");
+validator2.add("email", "email");
+console.log(validator2.validate(validFormData)); 
+// { pass: true, message: '所有字段验证通过' }
+```
+
+### 3. 适用场景
+- 支付方式选择（支付宝、微信、银行卡，不同支付逻辑封装为策略）；
+- 排序算法切换（冒泡、快速、插入排序，根据数据量选择策略）；
+- 表单验证（不同字段用不同验证规则，如手机号、邮箱、金额）；
+- 折扣计算（会员折扣、节日折扣、满减折扣，不同策略计算折扣）。
+
+## 三、规范模式 vs 策略模式
+| 特性                | 规范模式                          | 策略模式                          |
+|---------------------|-----------------------------------|-----------------------------------|
+| 核心目的            | 组合多个规则（逻辑运算）          | 替换不同算法（逻辑选择）          |
+| 逻辑关系            | 多规则的“与/或/非”组合            | 单规则的“替换”                    |
+| 适用场景            | 多条件组合验证                    | 多可选算法切换                    |
+| 代码结构            | 基础类 + 组合类 + 具体规则类      | 策略接口 + 具体策略类 + 上下文类  |
+
+## 四、总结
+1. **规范模式**：适合**多规则组合**，比如“满足A且满足B或不满足C”，核心是规则的逻辑组合；
+2. **策略模式**：适合**多算法替换**，比如“选A算法或B算法”，核心是算法的灵活切换；
+3. JS 中无需严格遵循类的继承，可通过对象/函数简化实现（如示例中策略模式用对象封装，规范模式用类）。
